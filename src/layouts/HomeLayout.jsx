@@ -6,7 +6,7 @@ const HomeLayout = () => {
         <div>
             <header>
                 <Header />
-                <section>
+                <section className="w-11/12 mx-auto">
                     <LatestNews />
                 </section>
             </header>
