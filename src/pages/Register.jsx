@@ -1,25 +1,36 @@
-import { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../provider/AuthProvider';
 
 const Register = () => {
-    const { createNewUser, setUser } = useContext(AuthContext);
+    const { createNewUser, setUser, updateUserProfile } = useContext(AuthContext);
+    const navigate = useNavigate()
+    const [error, setError] = useState({})
 
     const handleSubmit = e => {
         e.preventDefault();
         // get form data
         const form = new FormData(e.target);
         const name = form.get('name');
+        if (name.length<5) {
+            setError({ ...error, name: "Must be more than 5 charrecter length" })
+            return;
+        }
         const email = form.get('email');
         const photo = form.get('photo');
         const password = form.get('password');
-        console.log(name, email, photo, password);
 
         createNewUser(email, password)
             .then(result => {
                 const user = result.user;
                 setUser(user);
-                console.log(user);
+                updateUserProfile({ displayName: name, photoURL: photo })
+                    .then(() => {
+                        navigate('/');
+                    })
+                    .catch(err => {
+                        console.log(err);
+                    });
             })
             .catch(error => {
                 const errorCode = error.code;
@@ -39,6 +50,11 @@ const Register = () => {
                         </label>
                         <input type="text" name="name" placeholder="Enter your name" className="input input-bordered rounded-none bg-[#F3F3F3]" required />
                     </div>
+                    {error.name && (
+                        <label className="label text-sm text-rose-500">
+                           {error.name}
+                        </label>
+                    )}
 
                     <div className="form-control">
                         <label className="label">
